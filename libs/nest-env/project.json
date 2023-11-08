@@ -1,0 +1,48 @@
+{
+  "name": "nest-env",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/nest-env/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/nest-env",
+        "tsConfig": "libs/nest-env/tsconfig.lib.json",
+        "packageJson": "libs/nest-env/package.json",
+        "main": "libs/nest-env/src/index.ts",
+        "assets": ["libs/nest-env/*.md"]
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs nest-env {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/nest-env/**/*.ts",
+          "libs/nest-env/package.json"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/nest-env/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    }
+  },
+  "tags": []
+}

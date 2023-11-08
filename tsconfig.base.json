@@ -14,7 +14,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@agkit/nest-env": ["libs/nest-env/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
