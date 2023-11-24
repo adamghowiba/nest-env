@@ -84,7 +84,7 @@ export function validateWithoutThrowing<T extends ClassConstructor<T>>(
 export function validateAll<T extends ClassConstructor<T>>(
   config: Record<string, unknown>,
   validatorConstructor: T[]
-) {
+): Record<string, unknown> {
   const validationOutput = validatorConstructor.reduce(
     (
       acc: {
@@ -124,5 +124,5 @@ export function validateAll<T extends ClassConstructor<T>>(
     ...validationOutput.validatedConfigs
   );
 
-  return combinedConfigs
+  return combinedConfigs;
 }

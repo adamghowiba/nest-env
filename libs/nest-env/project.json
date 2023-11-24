@@ -6,22 +6,44 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/nest-env",
         "tsConfig": "libs/nest-env/tsconfig.lib.json",
         "packageJson": "libs/nest-env/package.json",
         "main": "libs/nest-env/src/index.ts",
-        "assets": ["libs/nest-env/*.md"]
+        "assets": [
+          "libs/nest-env/*.md"
+        ]
       }
     },
-    "publish": {
+    "publish-old": {
       "command": "node tools/scripts/publish.mjs nest-env {args.ver} {args.tag}",
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "publish": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "nx run nest-env:build"
+          },
+          {
+            "command": "ts-node ./tools/scripts/publish-cmd.ts publish"
+          }
+        ],
+        "parallel": false
+      }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
         "lintFilePatterns": [
           "libs/nest-env/**/*.ts",
@@ -31,7 +53,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "libs/nest-env/jest.config.ts",
         "passWithNoTests": true

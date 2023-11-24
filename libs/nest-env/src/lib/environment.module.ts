@@ -58,10 +58,10 @@ export class EnvironmentModule {
           envFilePath: ['.env.local', '.env.development', '.env'],
           isGlobal: isGlobal,
           validate: (config) => {
-            const environmentVariables =
+            const getEnvironmentValidators =
               getEnvironmentVariablesWithDefaults(params);
 
-            return validateAll(config, environmentVariables);
+            return validateAll(config, getEnvironmentValidators);
           },
           ...params,
         }),
