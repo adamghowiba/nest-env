@@ -24,15 +24,23 @@ function invariant(condition, message) {
 // Default "tag" to "next" so we won't publish the "latest" tag by accident.
 const [, , name, version, tag = 'next'] = process.argv;
 
-// A simple SemVer validation to validate the version
-const validVersion = /^\d+\.\d+\.\d+(-\w+\.\d+)?/;
-invariant(
-  version && validVersion.test(version),
-  `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${version}.`
-);
-
 const graph = readCachedProjectGraph();
 const project = graph.nodes[name];
+
+// const projectRoot = project.data.root
+// console.log({projectRoot});
+
+// A simple SemVer validation to validate the version
+const versionBumpTypes = ['major', 'minor', 'patch']
+const versionType = versionBumpTypes.includes(version) ? 'auto' : 'manual'
+
+if (versionType === 'manual') {
+  const validVersion = /^\d+\.\d+\.\d+(-\w+\.\d+)?/;
+  invariant(
+    version && validVersion.test(version),
+    `No version provided or version did not match Semantic Versioning, expected: #.#.#-tag.# or #.#.#, got ${version}.`
+  );
+}
 
 invariant(
   project,
@@ -42,7 +50,7 @@ invariant(
 const outputPath = project.data?.targets?.build?.options?.outputPath;
 invariant(
   outputPath,
-  `Could not find "build.options.outputPath" of project "${name}". Is project.json configured  correctly?`
+  `Could not find "build.options.outputPath" of project "${name}". Is project.json configured correctly?`
 );
 
 process.chdir(outputPath);
