@@ -15,7 +15,7 @@ import { EnvironmentVariablesNotFoundError } from './errors/environment-variable
  * @returns
  */
 const formatErrorMessages = (errors: ValidationError[]) => {
-  return errors.reduce((acc: string[], error) => {
+  return errors.reduce((acc: string[], error, i) => {
     const { target, ...rest } = error;
 
     let errorMessage = '';
@@ -29,7 +29,7 @@ const formatErrorMessages = (errors: ValidationError[]) => {
         rest.property
       } has failed with the following constraints: ${constraintKeys.join(
         ', '
-      )} ${errorMessageParts}\n\n`;
+      )} ${errorMessageParts}\n${i === errors.length - 1 ? '' : '\n'}`;
     } else {
       errorMessage = `${rest.property} has failed validation`;
     }

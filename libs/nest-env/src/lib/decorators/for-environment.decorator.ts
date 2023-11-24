@@ -1,10 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { applyDecorators } from '@nestjs/common';
 import { ValidateIf } from 'class-validator';
+import { LiteralUnion } from '../types/literal-union';
 
 /**
- * Only validates the property for s given application environment (APPLICATION_ENV)
+ * Only validates the property for a given application environment (APPLICATION_ENV).
+ * Helpful when working with tools like NX which replaced NODE_ENV
  * @param applicationEnvironment Application environment to check for
+ *
+ * @example ```ts
+ *  @ForApplicationEnvironment('staging')
+ * ```
  */
 export const ForApplicationEnvironment = (
   applicationEnvironment: string | string[]
@@ -28,12 +34,17 @@ export const ForApplicationEnvironment = (
   );
 };
 
+export type ForNodeEnvironmentUnion = LiteralUnion<
+  'development' | 'production',
+  string
+>;
+
 /**
  * Only validates the property for a given node environment (NODE_ENV)
  * @param applicationEnvironment Application environment to check for
  */
 export const ForNodeEnvironment = (
-  nodeEnvironment: string | string[]
+  nodeEnvironment: ForNodeEnvironmentUnion | ForNodeEnvironmentUnion[]
 ) => {
   return applyDecorators(
     ValidateIf((object, value) => {
