@@ -1,10 +1,11 @@
 import { confirm, input, select } from '@inquirer/prompts';
-import { execSync } from 'child_process';
+import { ExecSyncOptionsWithStringEncoding, execSync } from 'child_process';
 import { program } from 'commander';
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { ReleaseType, inc, lte, valid } from 'semver';
 import { LiteralUnion } from '../../libs/nest-env/src';
+import { safeExecSync } from './utils/safe-exec-sync.util';
 
 const nestEnvRootPath = path.join(process.cwd(), 'libs/nest-env');
 const nestEnvPackageJsonPath = path.join(nestEnvRootPath, 'package.json');
@@ -31,14 +32,15 @@ const promptReleaseTag = async () => {
   const result: LiteralUnion<'latest' | 'next' | 'experimental', string> =
     await select({
       message: 'What type of publish?',
+      default: 'next',
       choices: [
-        {
-          value: 'latest',
-          name: 'Latest',
-        },
         {
           value: 'next',
           name: 'Next',
+        },
+        {
+          value: 'latest',
+          name: 'Latest',
         },
         {
           value: 'experimental',
@@ -64,20 +66,29 @@ const publishPackage = async (params: {
   tag?: string;
 }) => {
   try {
+    const tag = await promptReleaseTag();
+
     const confirmation = await confirmPublish(params.version);
     if (!confirmation) return process.exit(0);
 
-    updateVersion(params.version);
-    const tag = await promptReleaseTag();
+    const testOutput = safeExecSync(`npx nx test nest-env`, {
+      encoding: 'utf-8',
+      error: 'nest-env tests failed',
+    });
+    console.debug('Test suites ran successfully');
+    const buildOutput = safeExecSync(`npx nx build nest-env`, {
+      encoding: 'utf-8',
+      error: 'nest-env build failed to run',
+    });
+    console.debug('nest-env built successfully');
 
-    const testOutput = execSync(`npx nx test nest-env`);
-    const buildOutput = execSync(`npx nx build nest-env`);
-    console.debug(buildOutput.toString('utf-8'));
+    updateVersion(params.version);
 
     process.chdir(nestEnvRootPath);
     execSync(`npm publish --access public --tag ${tag || 'next'}`);
   } catch (error) {
     updateVersion(params.previousVersion);
+
     throw error;
   }
 };
