@@ -22,6 +22,8 @@
     "publish-old": {
       "command": "node tools/scripts/publish.mjs nest-env {args.ver} {args.tag}",
       "dependsOn": [
+        "^lint",
+        "^test",
         "build"
       ]
     },
